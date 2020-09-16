@@ -25,14 +25,14 @@ if __name__=="__main__":
     if not isinstance(input, list):
         input = [input]
 
-    df = pd.DataFrame.from_records(input)
 
     model_name = "demo_model.pkl"
     #write the folder with the correct model id you wanna try:
-    model_id = "20200916_144220"
+    model_id = "20200916_171005"
     model: Predictor = load_pkl(os.path.join(config.OUTPUT_FOLDER,
                                              "home_insurance_{}".format(model_id),
                                              "model",
                                              "home_insurance_{}.pickle".format(model_id)))
-    results = model.predict(df)
+    X = pd.DataFrame.from_records(input)
+    results = model.predict(X)
     logging.info("Output: {}".format(results))

@@ -52,6 +52,9 @@ def set_configs(launcher):
 
 
 if __name__ == "__main__":
+    if not os.path.exists(config.AUTOML_FOLDER):
+        os.mkdir(config.AUTOML_FOLDER)
+
     launcher = MlMachineLauncher(base_folder=config.AUTOML_FOLDER,
                                  name="esure_home_insurance",
                                  loader=loader,

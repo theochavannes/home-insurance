@@ -18,13 +18,20 @@ class Predictor:
         self.model_id = None
 
 
-    def get_name(self, ext=None):
-        name = "home_insurance_{}".format(self.model_id)
-        if ext is not None:
-            name = name + "." + ext
-        return name
-
     def train(self, data):
+        """This method trains the Predictor. It does more than a machine learning model. Training the
+        predictor creates a folder where it saves all the needed outputs (data for the automl, pickle of itself,
+        shap values graphs and dependence plots...). It stores all the important information (scores,
+        machine learning pipeline,...)
+            Parameters
+            ----------
+            data: DataFrame
+                the input data
+
+            Output
+            ------
+            None
+        """
         self._initialize()
         data = pd.read_csv(config.DATA_PATH)
         data = data.drop(["i", "Police", "CAMPAIGN_DESC"], axis=1)
@@ -55,6 +62,23 @@ class Predictor:
         self._make_shap_plots(X)
 
     def predict(self, X, top_n=5, round_number=2):
+        """This method should be used once the trained pickle model is loaded.
+            Parameters
+            ----------
+            X: DataFrame
+                the input data
+            top_n: int
+                the top_n most important features for each data of the input (shap values)
+            round_number: int
+                returning the shap values rounded at round_number
+
+            Output
+            ------
+            results: list
+                a list of dictionaries containing, for element i, the prediction and the shap values
+                for the data row number i
+        """
+
         for col in DATES_COLS:
             X[col] = pd.to_datetime(X[col], errors="coerce")
 
@@ -77,26 +101,25 @@ class Predictor:
             results.append(result)
         return results
 
-    #
-    # def _cross_val_score(self, X, y, cv=None, scoring=None):
-    #     if scoring is None:
-    #         scoring = roc_auc_score
-    #
-    #     if cv is None:
-    #         cv = ShuffleSplit(n_splits=5, test_size=0.25)
-    #
-    #     scores = []
-    #     for train_index, test_index in cv.split(X):
-    #         X_test, y_test = X.iloc[test_index], y.iloc[test_index]
-    #         self.pipeline.fit(X, y)
-    #
-    #         p_oos = self.pipeline.predict_proba(X_test)
-    #
-    #         scores.append(scoring(X_test, p_oos))
-    #
-    #     return scores
 
+    def get_name(self, ext=None):
+        """
+        This method returns the name of package + the model + eventually an extension
+        Parameters
+            ----------
+            ext (Optional): string
+                the name of the extension
 
+            Output
+            ------
+            name: string
+                name of package + the model + eventually an extension
+
+        """
+        name = "home_insurance_{}".format(self.model_id)
+        if ext is not None:
+            name = name + "." + ext
+        return name
 
     def get_shap_values(self, X):
         self.ml_model = self.pipeline.models["LGBMClassifier"]
@@ -112,11 +135,15 @@ class Predictor:
     def _initialize(self):
         self.model_id = datetime.now().strftime("%Y%m%d_%H%M%S")
         self.save_output_path = os.path.join(config.OUTPUT_FOLDER, self.get_name())
-        os.mkdir(self.save_output_path)
+        if not os.path.exists(self.save_output_path):
+            os.mkdir(self.save_output_path)
+
         self.graph_folder = os.path.join(self.save_output_path, "graphs")
         self.model_folder = os.path.join(self.save_output_path, "model")
-        os.mkdir(self.graph_folder)
-        os.mkdir(self.model_folder)
+        if not os.path.exists(self.graph_folder):
+            os.mkdir(self.graph_folder)
+        if not os.path.exists(self.model_folder):
+            os.mkdir(self.model_folder)
 
 
     def _create_dates_features(self, data, dates_cols, drop):
@@ -163,15 +190,19 @@ class Predictor:
         plt.savefig(features_importances_path)
         plt.clf()
 
-        best_indexes = np.abs(self.shap_values).mean(axis=0).argsort()[:50][::-1]
+        best_indexes = np.abs(self.shap_values).mean(axis=0).argsort()[-50:][::-1]
         name_indexes = X_tree.columns[best_indexes]
         dependence_plots_folder = os.path.join(self.graph_folder, "dependence_plots")
-        os.mkdir(dependence_plots_folder)
+        if not os.path.exists(dependence_plots_folder):
+            os.mkdir(dependence_plots_folder)
+            os.mkdir(os.path.join(dependence_plots_folder, "most_important_dependences"))
 
-        for feature in name_indexes:
+        for i, feature in enumerate(name_indexes):
             plt.clf()
             shap.dependence_plot(feature, self.shap_values, X_tree, interaction_index=None, show=False)
             plt.tight_layout()
-            dependence_plot_path = os.path.join(dependence_plots_folder, "dependence_plot_{}_{}".format(feature, self.model_id))
+            if i<10:
+                dependence_plot_path = os.path.join(dependence_plots_folder, "most_important_dependences", "dependence_plot_{}_{}_{}".format(i+1, feature, self.model_id))
+            else:
+                dependence_plot_path = os.path.join(dependence_plots_folder, "dependence_plot_{}_{}_{}".format(i+1, feature, self.model_id))
             plt.savefig(dependence_plot_path)
-            plt.clf()
