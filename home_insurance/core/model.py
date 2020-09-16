@@ -54,14 +54,29 @@ class Predictor:
         self.shap_values = self.get_shap_values(X)
         self._make_shap_plots(X)
 
-    def predict(self, data):
+    def predict(self, X, top_n=5, round_number=2):
         for col in DATES_COLS:
-            data[col] = pd.to_datetime(data[col], errors="coerce")
+            X[col] = pd.to_datetime(X[col], errors="coerce")
 
-        data = self._create_dates_features(data, DATES_COLS, True)
-        data = self._create_computation_features(data)
+        X = self._create_dates_features(X, DATES_COLS, True)
+        X = self._create_computation_features(X)
 
-        return list(self.pipeline.predict_proba(data)[:, 1])
+        predictions = self.pipeline.predict_proba(X)
+        shap_values = list(self.get_shap_values(X))
+        predictions = list(predictions)
+        if round is not None:
+            shap_values = np.round(shap_values, round_number)
+
+        features_influence = pd.DataFrame(shap_values, columns=self._tree_columns)
+
+        results = []
+        for i, pred in enumerate(predictions):
+            result = {}
+            sort = np.abs(features_influence.iloc[i]).sort_values(ascending=False)[:top_n]
+            result["explanation"] = features_influence.iloc[i].loc[sort.index].to_dict()
+            results.append(result)
+        return results
+
     #
     # def _cross_val_score(self, X, y, cv=None, scoring=None):
     #     if scoring is None:
@@ -86,8 +101,9 @@ class Predictor:
     def get_shap_values(self, X):
         self.ml_model = self.pipeline.models["LGBMClassifier"]
         self.tree_explainer = shap.TreeExplainer(self.ml_model)
-        self.preprocess_pipeline = pipeline.get_subpipeline(end_node="PassThrough")
+        self.preprocess_pipeline = self.pipeline.get_subpipeline(end_node="PassThrough")
         X_tree = self.preprocess_pipeline.transform(X)
+        self._tree_columns = X_tree.columns
         shap_values = self.tree_explainer.shap_values(X_tree)[1]
         return shap_values
 
@@ -147,7 +163,7 @@ class Predictor:
         plt.savefig(features_importances_path)
         plt.clf()
 
-        best_indexes = np.abs(self.shap_values).mean(axis=0).argsort()[-20:][::-1]
+        best_indexes = np.abs(self.shap_values).mean(axis=0).argsort()[:50][::-1]
         name_indexes = X_tree.columns[best_indexes]
         dependence_plots_folder = os.path.join(self.graph_folder, "dependence_plots")
         os.mkdir(dependence_plots_folder)

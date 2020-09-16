@@ -7,6 +7,7 @@ from lightgbm.sklearn import LGBMClassifier
 from sklearn.impute import SimpleImputer, MissingIndicator
 from home_insurance.constants import CATEGORICAL_FEATURES
 from aikit.transformers.base import PassThrough
+from home_insurance.core.transformers import *
 
 # numerical_encoder = NumericalEncoder()
 # missing_indicator = MissingIndicator()
@@ -36,6 +37,8 @@ numerical_encoder = NumericalEncoder(columns_to_use=['CLAIM3YEARS', 'P1_EMP_STAT
                  max_na_percentage=0.05, min_modalities_number=20,
                  min_nb_observations=10, regex_match=False)
 
+binary_columns_cleaner = BinaryColumnsCleaner()
+
 #this one does nothing but is used to use the pipeline without the classifier (for shap):
 pass_through = PassThrough()
 classifier = LGBMClassifier(boosting_type='gbdt', class_weight=None, colsample_bytree=1.0,
@@ -46,9 +49,10 @@ classifier = LGBMClassifier(boosting_type='gbdt', class_weight=None, colsample_b
                subsample=1.0, subsample_for_bin=200000, subsample_freq=0)
 
 pipeline = GraphPipeline(edges=[("ColumnsSelector", "NumImputer"),
-                     ("NumericalEncoder", "NumImputer", "PassThrough", "LGBMClassifier")],
+                     ("NumericalEncoder", "NumImputer", "BinaryColumnsCleaner", "PassThrough", "LGBMClassifier")],
               models={"ColumnsSelector": columns_selector,
                       "NumericalEncoder": numerical_encoder,
                       "NumImputer": imputer,
+                      "BinaryColumnsCleaner": binary_columns_cleaner,
                       "PassThrough": pass_through,
                       "LGBMClassifier": classifier})
