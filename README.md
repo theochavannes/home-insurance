@@ -17,31 +17,31 @@ Home insurance dataset case study.pptx
 
 ### Step 1: Create a virtual environment (optional)
 Please create a virtual environment on which you will work with
-this library. 
+this package. 
 
 This can be done this way (in the command prompt):
 
 `conda create --name myenv`
 
 You do not need to create a virtual environment, but it is best
-practice since the library has some packages requirements
+practice since the package has some packages requirements
 (some specified version of scikit learn etc.). If you
 do not use a virtual environment, it will replace your version
-of your libraries by the one specified in requirements.txt.
+of your packages by the one specified in requirements.txt.
 
 ### Step 2: Activate your virtual environment (optional)
 In the command prompt:
 
 `activate myenv`
 
-### Step 3: Install the library.
+### Step 3: Install the package.
 Go in the folder of the project (containing "setup.py"). 
 Then run the following (in the command prompt):
 
 `pip install -e .`
 
-This will install the library home-insurance and all
-the required libraries (in requirements.txt)
+This will install the package home-insurance and all
+the required packages (in requirements.txt)
 If you work on an OSX system, virtual envs and matplotlib
 may failed to work together. More information about
 how to use matplotlib in an OSX system and a virtual 
@@ -54,7 +54,7 @@ Then, create an (temporary) environment variable called
 "HOME_INSURANCE_DATA_FOLDER" and set it
 to the path of the folder in which you will 
 save all the outputs. You can also, instead, go in the file "config.py"
-of the library, and replace
+of the package, and replace
 "C:\\data\\esure\\home-insurance" by your path.
 
 ### Step 5: Do some data analysis
