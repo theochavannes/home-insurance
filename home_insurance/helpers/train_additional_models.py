@@ -3,6 +3,7 @@ This file cis used to build a baseline model (logistic regression) and one very 
 can not be run in the automl because of the time taken to fit it. It is still good to try it just in case?
 """
 import numpy as np
+import logging
 
 np.random.seed(123)
 from home_insurance.config import config
@@ -26,14 +27,17 @@ if __name__ == "__main__":
     X = preprocess.fit_transform(X, y)
     most_basic_model = LogisticRegression()
 
+    logging.info("Calculating baseline score")
     baseline_scores = cross_val_score(most_basic_model, X, y, cv=5, scoring="roc_auc")
     baseline_score = np.mean(baseline_scores)
-    print("baseline_score " + str(baseline_score))
+    logging.info("baseline_score " + str(baseline_score))
 
     dict_scores["LogisticRegressionBaseline"] = baseline_score
 
     X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2)
     svc = SVC(probability=True)
+    logging.info("Calculating SVM score")
+
     svc.fit(X_train, y_train)
     p_oos = svc.predict_proba(X_test)
     svm_score = roc_auc_score(y_test, p_oos)

@@ -45,23 +45,23 @@ class Predictor:
             how="all")
 
         # data = data.drop(DROP_LOOK_AT, axis=1)
+        logging.info("Converting to datetime the following columns: {}".format(DATES_COLS))
         for col in DATES_COLS:
             data[col] = pd.to_datetime(data[col], errors="coerce")
 
         data = self._create_dates_features(data, DATES_COLS, True)
         data = self._create_computation_features(data)
         data.to_csv(os.path.join(config.DATA_FOLDER, "data_for_automl.csv"), index=False)
-        # data = self._clean_binary_features(data)
-
+        logging.info("Creating X and y")
         X, y = data.drop(["POL_STATUS"], axis=1), (data["POL_STATUS"] == "Lapsed").astype(int)
-        cv = ShuffleSplit(n_splits=5, test_size=0.3)
-        self.pipeline = pipeline
 
+        self.pipeline = pipeline
+        logging.info("Calculating model performances")
         self.scores = cross_val_score(self.pipeline, X, y, cv=5, scoring="roc_auc")
         logging.info("Cross val scores: {}".format(self.scores))
-
+        logging.info("Fitting the model on the whole data")
         self.pipeline.fit(X, y)
-
+        logging.info("Calculating shap values")
         self.shap_values = self.get_shap_values(X)
         self._make_shap_plots(X)
 
@@ -156,18 +156,24 @@ class Predictor:
                     ------
                     None
                 """
+        logging.info("Initializing the model, model_id:{}".format(self.model_id))
+
         self.model_id = datetime.now().strftime("%Y%m%d_%H%M%S")
         if not os.path.exists(config.OUTPUT_FOLDER):
+            logging.info("Creating folder: {}".format(config.OUTPUT_FOLDER))
             os.mkdir(os.path.join(config.OUTPUT_FOLDER))
         self.save_output_path = os.path.join(config.OUTPUT_FOLDER, self.get_name())
         if not os.path.exists(self.save_output_path):
+            logging.info("Creating folder: {}".format(self.save_output_path))
             os.mkdir(self.save_output_path)
 
         self.graph_folder = os.path.join(self.save_output_path, "graphs")
         self.model_folder = os.path.join(self.save_output_path, "model")
         if not os.path.exists(self.graph_folder):
+            logging.info("Creating folder: {}".format(self.graph_folder))
             os.mkdir(self.graph_folder)
         if not os.path.exists(self.model_folder):
+            logging.info("Creating folder: {}".format(self.model_folder))
             os.mkdir(self.model_folder)
 
     def _create_dates_features(self, data, dates_cols, drop):
@@ -187,6 +193,7 @@ class Predictor:
                     data: DataFrame
                         the data with new features created as mentioned
                 """
+        logging.info("Creating dates features")
         for col in dates_cols:
             day = col + "_" + "day"
             month = col + "_" + "month"
@@ -219,6 +226,7 @@ class Predictor:
                     data: DataFrame
                         the data with newly created features
         """
+        logging.info("Creating computation features")
         data["TOTAL_SUM"] = data["SUM_INSURED_BUILDINGS"] + \
                             data["SUM_INSURED_CONTENTS"] + \
                             data["SPEC_SUM_INSURED"]
@@ -236,7 +244,7 @@ class Predictor:
             ------
             None
         """
-
+        logging.info("Creating shap plot")
         # step 1: create shap values plot
         X_tree = self.preprocess_pipeline.transform(X)
         shap.summary_plot(self.shap_values, X_tree, show=False, plot_size=(30, 15))
@@ -245,6 +253,7 @@ class Predictor:
         plt.savefig(shap_values_path)
         plt.clf()
 
+        logging.info("Creating feature importances barplot")
         # step 2: create features importances barplot
         shap.summary_plot(self.shap_values, X_tree, show=False, plot_size=(30, 15), plot_type="bar")
         plt.tight_layout()
@@ -252,6 +261,7 @@ class Predictor:
         plt.savefig(features_importances_path)
         plt.clf()
 
+        logging.info("Creating dependence plots")
         # step 3: create all the dependence plots from the 50 most important features, according to shap
         best_indexes = np.abs(self.shap_values).mean(axis=0).argsort()[-50:][::-1]
         name_indexes = X_tree.columns[best_indexes]
