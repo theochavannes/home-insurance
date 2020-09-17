@@ -21,7 +21,7 @@ this library.
 
 This can be done this way (in the command prompt):
 
-conda create --name myenv
+`conda create --name myenv`
 
 You do not need to create a virtual environment, but it is best
 practice since the library has some packages requirements
@@ -32,13 +32,13 @@ of your libraries by the one specified in requirements.txt.
 ### Step 2: Activate your virtual environment (optional)
 In the command prompt:
 
-activate myenv
+`activate myenv`
 
 ### Step 3: Install the library.
 Go in the folder of the project (containing "setup.py"). 
 Then run the following (in the command prompt):
 
-pip install -e .
+`pip install -e .`
 
 This will install the library home-insurance and all
 the required libraries (in requirements.txt)
@@ -50,12 +50,10 @@ environment:
 https://matplotlib.org/3.1.0/faq/osx_framework.html
 
 ### Step 4: Create a folder in which you will save all the outputs
-Then, create an environment variable called
+Then, create an (temporary) environment variable called
 "HOME_INSURANCE_DATA_FOLDER" and set it
 to the path of the folder in which you will 
-save all the outputs.
-
-You can also, instead, go in the file "config.py"
+save all the outputs. You can also, instead, go in the file "config.py"
 of the library, and replace
 "C:\\data\\esure\\home-insurance" by your path.
 
@@ -97,7 +95,8 @@ the explanations (i.e. the shap values).
 Once steps 1-5 are done, you can run an automl if you
 want. Go in the folder home_insurance/helpers. Then 
 in a prompt, execute:
-python run_automl.py run
+
+`python run_automl.py run`
 
 This will create the AUTOML_FOLDER in your path.
 It will store in it all the required information.
@@ -105,7 +104,7 @@ It will store in it all the required information.
 Once you are ready to get the results, just execute
 in a prompt:
 
-python run_automl.py result
+`python run_automl.py result`
 
 It will create an excel file result.xlsx
 in the AUTOML_FOLDER.
