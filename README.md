@@ -66,7 +66,7 @@ seems to be useful to predict the "lapsed" cases.
 
 
 ### Step 6: Train the Predictor
-In home_insurance/helpers, execute the file "train_model.py"
+In home_insurance/helpers, execute the file "train_predictor.py"
 This will create a folder for this execution in the
 path you specified, and it will store all the
 relevant outputs (pickle of the Predictor, 

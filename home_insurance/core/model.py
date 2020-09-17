@@ -157,6 +157,8 @@ class Predictor:
                     None
                 """
         self.model_id = datetime.now().strftime("%Y%m%d_%H%M%S")
+        if not os.path.exists(config.OUTPUT_FOLDER):
+            os.mkdir(os.path.join(config.OUTPUT_FOLDER))
         self.save_output_path = os.path.join(config.OUTPUT_FOLDER, self.get_name())
         if not os.path.exists(self.save_output_path):
             os.mkdir(self.save_output_path)

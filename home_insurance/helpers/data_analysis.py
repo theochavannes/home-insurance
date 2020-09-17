@@ -10,12 +10,13 @@ import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 import seaborn as sns
+import logging
 
 from home_insurance.config import config
 from home_insurance.constants import *
 
 if __name__ == "__main__":
-    print(config.DATA_PATH)
+    logging.info("Working on folder {}".format(config.DATA_PATH))
     data = pd.read_csv(config.DATA_PATH)
     data = data.drop(["i", "Police", "CAMPAIGN_DESC"], axis=1)
     data = data.drop(["PAYMENT_FREQUENCY"], axis=1)
@@ -26,7 +27,9 @@ if __name__ == "__main__":
 
     # creating all required folders
     if not os.path.exists(config.DATA_ANALYSIS_FOLDER):
+        logging.info("Creating data analysis folder")
         os.mkdir(config.DATA_ANALYSIS_FOLDER)
+
     analysis_id = datetime.now().strftime("%Y%m%d_%H%M%S")
     current_folder = os.path.join(config.DATA_ANALYSIS_FOLDER, analysis_id)
     cat_corr_folder = os.path.join(current_folder, "cat_corr")
@@ -46,6 +49,7 @@ if __name__ == "__main__":
     # often leads to a lapsed case or not
     cat_corr_dict = {}
     value_counts = {}
+    logging.info("Saving value counts of categorical features")
     for col in CATEGORICAL_FEATURES:
         cat_corr = data.groupby([col])['POL_STATUS'].value_counts(normalize=True).rename(
             "cat_corr_" + col).reset_index()
@@ -64,6 +68,7 @@ if __name__ == "__main__":
     # sorting the features per the handmade measure, so that we can store this information in the plots names
     data_cat_corr = pd.Series(cat_corr_dict).sort_values(ascending=False)
 
+    logging.info("Saving %label by categorical value for categorical features")
     for i, col in enumerate(data_cat_corr.index):
         plt.clf()
         cat_corr = data.groupby([col])['POL_STATUS'].value_counts(normalize=True).rename(
