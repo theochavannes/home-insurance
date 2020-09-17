@@ -1,3 +1,8 @@
+"""
+This file is used to do some data analysis. It creates plots and save them in some automatically created folders,
+in the home insurance data folder;
+"""
+
 import os
 from datetime import datetime
 

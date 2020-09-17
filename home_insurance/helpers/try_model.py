@@ -1,3 +1,7 @@
+"""
+This file is used to try the model and simulate having it delivered as an API. (takes a json as an input and it
+outputs a dictionary)
+"""
 import json
 import logging
 import os

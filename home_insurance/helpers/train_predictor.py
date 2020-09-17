@@ -1,3 +1,6 @@
+"""
+This file is used to train the predictor and saves it as a pickle.
+"""
 import os
 
 import pandas as pd

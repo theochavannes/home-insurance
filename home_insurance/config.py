@@ -1,3 +1,8 @@
+"""
+This file contains the config, i.e. data folder and the data name.
+it creates variables that stores paths of folders that will be created by the training
+of the model, the data analysis etc.
+"""
 import logging
 import os
 import sys

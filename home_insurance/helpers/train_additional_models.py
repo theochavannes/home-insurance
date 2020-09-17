@@ -1,3 +1,7 @@
+"""
+This file cis used to build a baseline model (logistic regression) and one very slow model (svm), which
+can not be run in the automl because of the time taken to fit it. It is still good to try it just in case?
+"""
 import numpy as np
 
 np.random.seed(123)
@@ -29,7 +33,7 @@ if __name__ == "__main__":
     dict_scores["LogisticRegressionBaseline"] = baseline_score
 
     X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2)
-    svc = SVC()
+    svc = SVC(probability=True)
     svc.fit(X_train, y_train)
     p_oos = svc.predict_proba(X_test)
     svm_score = roc_auc_score(y_test, p_oos)

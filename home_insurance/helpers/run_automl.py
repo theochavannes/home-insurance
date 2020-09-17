@@ -1,3 +1,8 @@
+"""
+This file is used to execture the automl.
+Do not forgt to run it with the parameter "run", ie, in a prompt write:
+python run_automl.py run
+"""
 import numpy as np
 
 np.random.seed(123)

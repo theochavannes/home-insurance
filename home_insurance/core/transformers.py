@@ -1,7 +1,16 @@
+"""
+This file contains transformers included in the machine learning pipeline
+"""
 from sklearn.base import BaseEstimator, TransformerMixin
 
 
 class BinaryColumnsCleaner(BaseEstimator, TransformerMixin):
+    """
+    This class is used after a one hot encoder (aikit NumericalEncoder with "dummy" option).
+    One hot encoding on binary categorical columns creates 2 columns
+    ("Y" and "N" for example) but they contain the same information.
+    This transformers delete one of the two columns created.
+    """
     def __init__(self):
         pass
 

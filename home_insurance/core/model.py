@@ -1,3 +1,6 @@
+"""
+This file contains the class Predictor and all its methods
+"""
 import logging
 import os
 from datetime import datetime
@@ -98,7 +101,7 @@ class Predictor:
         for i, pred in enumerate(predictions):
             result = {}
             sort = np.abs(features_influence.iloc[i]).sort_values(ascending=False)[:top_n]
-            result["prediction"] = predictions[i]
+            result["confidence"] = predictions[i]
             result["explanation"] = features_influence.iloc[i].loc[sort.index].to_dict()
             results.append(result)
         return results

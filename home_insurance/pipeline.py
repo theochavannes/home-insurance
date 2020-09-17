@@ -1,3 +1,6 @@
+"""
+This file contains the machine learning pipeline that will be used by the model.
+"""
 from aikit.pipeline import GraphPipeline
 from aikit.transformers import ColumnsSelector
 from aikit.transformers import NumericalEncoder, NumImputer
@@ -5,15 +8,6 @@ from aikit.transformers.base import PassThrough
 from lightgbm.sklearn import LGBMClassifier
 
 from home_insurance.core.transformers import *
-
-# numerical_encoder = NumericalEncoder()
-# missing_indicator = MissingIndicator()
-# imputer = NumImputer()
-#
-# classifier = LGBMClassifier()
-# pipeline = Pipeline([("numerical_encoder", numerical_encoder),
-#                      ("imputer", imputer),
-#                      ("classifier", classifier)])
 
 
 columns_selector = ColumnsSelector(columns_to_drop=None,
