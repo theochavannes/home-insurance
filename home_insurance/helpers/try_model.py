@@ -1,13 +1,13 @@
-import os
-import logging
-import json_tricks
-
-from aikit.tools.helper_functions import load_pkl
 import json
+import logging
+import os
+
+import pandas as pd
+from aikit.tools.helper_functions import load_pkl
+
 from home_insurance.config import config
 from home_insurance.core.model import Predictor
 
-import pandas as pd
 
 def generate_try_data(name="try"):
     # choose the row number of the dataset you want to try
@@ -18,7 +18,8 @@ def generate_try_data(name="try"):
     logging.info("Trying input:\n {}".format(input))
     input.to_json(os.path.join(config.DATA_FOLDER, "{}.json".format(name)), orient="records")
 
-if __name__=="__main__":
+
+if __name__ == "__main__":
     name = "try"
     generate_try_data(name)
 
@@ -26,7 +27,7 @@ if __name__=="__main__":
     if not isinstance(input, list):
         input = [input]
 
-    #write the folder with the correct model id you wanna try:
+    # write the folder with the correct model id you wanna try:
     model_id = "20200916_171005"
     model: Predictor = load_pkl(os.path.join(config.OUTPUT_FOLDER,
                                              "home_insurance_{}".format(model_id),

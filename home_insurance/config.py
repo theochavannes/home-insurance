@@ -1,9 +1,10 @@
+import logging
 import os
 import sys
-import logging
 
 LOGGING_FORMAT = "%(asctime)-15s %(name)-15s %(levelname)-8s %(message)s"
 DATE_FORMAT = "%Y-%m-%d %H:%M:%S"
+
 
 class Config:
     DATA_FOLDER = os.getenv("HOME_INSURANCE_DATA_FOLDER", "C:\\data\\esure\\home-insurance")
@@ -12,6 +13,7 @@ class Config:
     AUTOML_FOLDER = os.path.join(DATA_FOLDER, "automl")
     DATA_ANALYSIS_FOLDER = os.path.join(DATA_FOLDER, "data_analysis")
     OUTPUT_FOLDER = os.path.join(DATA_FOLDER, "output")
+
 
 def set_logging():
     console_handler = logging.StreamHandler(stream=sys.stdout)

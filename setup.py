@@ -1,6 +1,5 @@
 from setuptools import setup, find_packages
 
-
 DISTNAME = 'home-insurance'
 DESCRIPTION = 'A library to solve the home insurance dataset problem'
 with open('README.md') as f:
