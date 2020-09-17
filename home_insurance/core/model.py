@@ -92,7 +92,7 @@ class Predictor:
         predictions = self.pipeline.predict_proba(X)[:, 1]
         shap_values = list(self.get_shap_values(X))
         predictions = list(predictions)
-        if round is not None:
+        if round_number is not None:
             shap_values = np.round(shap_values, round_number)
 
         features_influence = pd.DataFrame(shap_values, columns=self._tree_columns)
