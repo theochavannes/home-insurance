@@ -54,7 +54,7 @@ of the library, and replace
 "C:\\data\\esure\\home-insurance" by your path.
 
 ### Step 5: Do some data analysis
-You can read the exploration.ipynb at the root of the project
+You can (optional) read the exploration.ipynb at the root of the project
 which is a draft that allowed me
 to start the project and get some ideas.
 
