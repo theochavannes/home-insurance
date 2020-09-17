@@ -39,13 +39,13 @@ if __name__=="__main__":
     # often leads to a lapsed case or not
     cat_corr_dict = {}
     for col in CATEGORICAL_FEATURES:
-        cat_corr = data.groupby([col])['POL_STATUS'].value_counts(normalize=True).rename("cat_corr_"+col).reset_index()
+        cat_corr = data.groupby([col])['POL_STATUS'].value_counts(normalize=True, dropna=False).rename("cat_corr_"+col).reset_index()
         cat_corr = cat_corr[cat_corr["POL_STATUS"]==1].drop("POL_STATUS",axis=1).set_index(col)
         # this is a handmade measure of the fact that some values of a categorical feature may have
         # an important influence on the lapsed cases
         cat_corr_dict[col] = cat_corr.max().iloc[0] - cat_corr.min().iloc[0]
 
-        value_counts = data[col].value_counts(normalize=True)
+        value_counts = data[col].value_counts(normalize=True, dropna=False)
         sns.barplot(x=value_counts.index, y=value_counts)
         plt.tight_layout()
         plt.savefig(os.path.join(current_folder, "value_counts_{}.png".format(col)))
@@ -56,7 +56,7 @@ if __name__=="__main__":
 
     for i, col in enumerate(data_cat_corr.index):
         plt.clf()
-        cat_corr = data.groupby([col])['POL_STATUS'].value_counts(normalize=True).rename("cat_corr_" + col).reset_index()
+        cat_corr = data.groupby([col])['POL_STATUS'].value_counts(normalize=True, dropna=False).rename("cat_corr_" + col).reset_index()
         cat_corr = cat_corr[cat_corr["POL_STATUS"] == 1].drop("POL_STATUS", axis=1).set_index(col)
         sns_plot = sns.barplot(x=cat_corr["cat_corr_"+col].index,
                     y=cat_corr["cat_corr_"+col])

@@ -12,6 +12,8 @@ https://aikit.readthedocs.io/en/latest/auto_ml.html
 
 https://github.com/societe-generale/aikit
 
+The slides for the presentation are available inside the project:
+Home insurance dataset case study.pptx
 
 ### Step 1: Create a virtual environment
 Please create a virtual environment on which you will work with
