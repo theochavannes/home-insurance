@@ -92,7 +92,7 @@ the explanations (i.e. the shap values).
 
 
 ### Step 8 (Optional): Run an automl
-Once steps 1-5 are done, you can run an automl if you
+Once steps 6 is done, you can run an automl if you
 want. Go in the folder home_insurance/helpers. Then 
 in a prompt, execute:
 
