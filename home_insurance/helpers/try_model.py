@@ -30,8 +30,9 @@ if __name__ == "__main__":
     input = json.load(open(os.path.join(config.DATA_FOLDER, "{}.json".format(name)), "rb"))
     if not isinstance(input, list):
         input = [input]
-
-    # write the folder with the correct model id you wanna try:
+    ##########################################################################
+    # write the model id of the trained predictor you wanna try:
+    ##########################################################################
     model_id = "20200916_171005"
     model: Predictor = load_pkl(os.path.join(config.OUTPUT_FOLDER,
                                              "home_insurance_{}".format(model_id),

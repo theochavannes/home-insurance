@@ -15,7 +15,7 @@ https://github.com/societe-generale/aikit
 The slides for the presentation are available inside the project:
 Home insurance dataset case study.pptx
 
-### Step 1: Create a virtual environment
+### Step 1: Create a virtual environment (optional)
 Please create a virtual environment on which you will work with
 this library. 
 
@@ -23,7 +23,13 @@ This can be done this way (in the command prompt):
 
 conda create --name myenv
 
-### Step 2: Activate your virtual environment
+You do not need to create a virtual environment, but it is best
+practice since the library has some packages requirements
+(some specified version of scikit learn etc.). If you
+do not use a virtual environment, it will replace your version
+of your libraries by the one specified in requirements.txt.
+
+### Step 2: Activate your virtual environment (optional)
 In the command prompt:
 
 activate myenv
@@ -76,7 +82,7 @@ dependence plots etc.)
 In the folder home_insurance/helpers, in file
 try_model.py, specify the model id of the model
 you trained.
-(change the value of the variable "model_name")
+(change the value of the variable "model_id")
 
 Run the file. This will simulate having a json 
 to load (format of the input data). The data
