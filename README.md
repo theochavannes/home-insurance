@@ -51,14 +51,26 @@ You can also, instead, go in the file "config.py"
 of the library, and replace
 "C:\\data\\esure\\home-insurance" by your path.
 
-### Step 5: Train the Predictor
+### Step 5: Do some data analysis
+You can read the exploration.ipynb at the root of the project
+which is a draft that allowed me
+to start the project and get some ideas.
+
+In home_insurance/helpers, run the data_analysis.py file. It 
+will automatically create a folder data_analysis in your path,
+and it will save various plots. Looking at these plots can give some
+ideas of how the data looks like, and what variables initially
+seems to be useful to predict the "lapsed" cases.
+
+
+### Step 6: Train the Predictor
 In home_insurance/helpers, execute the file "train_model.py"
 This will create a folder for this execution in the
 path you specified, and it will store all the
 relevant outputs (pickle of the Predictor, 
 dependence plots etc.)
 
-### Step 6: Try the predictor (API simulation)
+### Step 7: Try the predictor (API simulation)
 In the folder home_insurance/helpers, in file
 try_model.py, specify the model id of the model
 you trained.
@@ -73,7 +85,7 @@ on it and outputs the predictions with
 the explanations (i.e. the shap values).
 
 
-### Step 7 (Optional): Run an automl
+### Step 8 (Optional): Run an automl
 Once steps 1-5 are done, you can run an automl if you
 want. Go in the folder home_insurance/helpers. Then 
 in a prompt, execute:
