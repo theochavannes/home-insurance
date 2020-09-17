@@ -10,7 +10,7 @@ class Config:
     DATA_NAME = os.getenv("HOME_INSURANCE_DATA_NAME", "home_insurance.csv")
     DATA_PATH = os.path.join(DATA_FOLDER, DATA_NAME)
     AUTOML_FOLDER = os.path.join(DATA_FOLDER, "automl")
-
+    DATA_ANALYSIS_FOLDER = os.path.join(DATA_FOLDER, "data_analysis")
     OUTPUT_FOLDER = os.path.join(DATA_FOLDER, "output")
 
 def set_logging():

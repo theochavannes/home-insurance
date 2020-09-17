@@ -61,12 +61,12 @@ class Predictor:
         self.shap_values = self.get_shap_values(X)
         self._make_shap_plots(X)
 
-    def predict(self, X, top_n=5, round_number=2):
+    def predict(self, data, top_n=5, round_number=2):
         """This method should be used once the trained pickle model is loaded.
             Parameters
             ----------
-            X: DataFrame
-                the input data
+            data: list
+                the input data (records format: list of dictionaries, each element of the list being a data)
             top_n: int
                 the top_n most important features for each data of the input (shap values)
             round_number: int
@@ -78,14 +78,14 @@ class Predictor:
                 a list of dictionaries containing, for element i, the prediction and the shap values
                 for the data row number i
         """
-
+        X = pd.DataFrame.from_records(data)
         for col in DATES_COLS:
             X[col] = pd.to_datetime(X[col], errors="coerce")
 
         X = self._create_dates_features(X, DATES_COLS, True)
         X = self._create_computation_features(X)
 
-        predictions = self.pipeline.predict_proba(X)
+        predictions = self.pipeline.predict_proba(X)[:, 1]
         shap_values = list(self.get_shap_values(X))
         predictions = list(predictions)
         if round is not None:
@@ -97,6 +97,7 @@ class Predictor:
         for i, pred in enumerate(predictions):
             result = {}
             sort = np.abs(features_influence.iloc[i]).sort_values(ascending=False)[:top_n]
+            result["prediction"] = predictions[i]
             result["explanation"] = features_influence.iloc[i].loc[sort.index].to_dict()
             results.append(result)
         return results
@@ -122,6 +123,17 @@ class Predictor:
         return name
 
     def get_shap_values(self, X):
+        """This method output the shap values, using the pipeline defined in the method train_model
+                    Parameters
+                    ----------
+                    X: DatFrame
+                        the input data
+
+                    Output
+                    ------
+                    shap_values: array
+                        The shap values for the data given
+                """
         self.ml_model = self.pipeline.models["LGBMClassifier"]
         self.tree_explainer = shap.TreeExplainer(self.ml_model)
         self.preprocess_pipeline = self.pipeline.get_subpipeline(end_node="PassThrough")
@@ -133,6 +145,16 @@ class Predictor:
 
 
     def _initialize(self):
+        """This method initialize the model. It creates the paths and working directories it needs to store the
+        outputs. It also defines the name of the model as the current time.
+                    Parameters
+                    ----------
+                    None
+
+                    Output
+                    ------
+                    None
+                """
         self.model_id = datetime.now().strftime("%Y%m%d_%H%M%S")
         self.save_output_path = os.path.join(config.OUTPUT_FOLDER, self.get_name())
         if not os.path.exists(self.save_output_path):
@@ -147,6 +169,22 @@ class Predictor:
 
 
     def _create_dates_features(self, data, dates_cols, drop):
+        """This method creates multiple features linked to the dates. It also drops the columns which were used to
+        create features (if specified).
+        The features created are: day, month, year, weekday, week number.
+                    Parameters
+                    ----------
+                    data: DataFrame
+                        the input data
+                    dates_cols: list
+                        the list of columns of type datetime, from which we want to create our features
+                    drop: Boolean
+                        Specify if we want to keep dates_cols at the end of the creation of features
+                    Output
+                    ------
+                    data: DataFrame
+                        the data with new features created as mentioned
+                """
         for col in dates_cols:
             day = col + "_" + "day"
             month = col + "_" + "month"
@@ -165,11 +203,21 @@ class Predictor:
 
         return data
 
-    def _clean_binary_features(self, data):
-        data[BINARY_COLS] = data[BINARY_COLS].apply(lambda col: col.map({"Y":1, "N":0}))
-        return data
 
     def _create_computation_features(self, data):
+        """This method should be used once the trained pickle model is loaded.
+        It creates some features which are computed from already existing features
+        by doing simple calculations.
+                    Parameters
+                    ----------
+                    data: DataFrame
+                        the input data
+
+                    Output
+                    ------
+                    data: DataFrame
+                        the data with newly created features
+        """
         data["TOTAL_SUM"] = data["SUM_INSURED_BUILDINGS"] + \
                             data["SUM_INSURED_CONTENTS"] + \
                             data["SPEC_SUM_INSURED"]
@@ -177,6 +225,18 @@ class Predictor:
         return data
 
     def _make_shap_plots(self, X):
+        """This method creates all the shap plots once the pipeline is fitted. It stores them in the graphs folder.
+            Parameters
+            ----------
+            X: DataFrame
+                the input data
+
+            Output
+            ------
+            None
+        """
+
+        #step 1: create shap values plot
         X_tree = self.preprocess_pipeline.transform(X)
         shap.summary_plot(self.shap_values, X_tree, show=False, plot_size=(30, 15))
         plt.tight_layout()
@@ -184,12 +244,14 @@ class Predictor:
         plt.savefig(shap_values_path)
         plt.clf()
 
+        #step 2: create features importances barplot
         shap.summary_plot(self.shap_values, X_tree, show=False, plot_size=(30, 15), plot_type="bar")
         plt.tight_layout()
         features_importances_path= os.path.join(self.graph_folder, "importance_{}".format(self.model_id))
         plt.savefig(features_importances_path)
         plt.clf()
 
+        #step 3: create all the dependence plots from the 50 most important features, according to shap
         best_indexes = np.abs(self.shap_values).mean(axis=0).argsort()[-50:][::-1]
         name_indexes = X_tree.columns[best_indexes]
         dependence_plots_folder = os.path.join(self.graph_folder, "dependence_plots")

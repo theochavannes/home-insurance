@@ -10,7 +10,8 @@ from home_insurance.core.model import Predictor
 import pandas as pd
 
 def generate_try_data(name="try"):
-    input = pd.read_csv(config.DATA_PATH).iloc[0].to_frame().T
+    # choose the row number of the dataset you want to try
+    input = pd.read_csv(config.DATA_PATH).iloc[10:20]
     input = input.drop(["i", "Police", "CAMPAIGN_DESC"], axis=1)
     input = input.drop(["PAYMENT_FREQUENCY"], axis=1)
     input = input.drop(["POL_STATUS"], axis=1)
@@ -25,14 +26,12 @@ if __name__=="__main__":
     if not isinstance(input, list):
         input = [input]
 
-
-    model_name = "demo_model.pkl"
     #write the folder with the correct model id you wanna try:
     model_id = "20200916_171005"
     model: Predictor = load_pkl(os.path.join(config.OUTPUT_FOLDER,
                                              "home_insurance_{}".format(model_id),
                                              "model",
                                              "home_insurance_{}.pickle".format(model_id)))
-    X = pd.DataFrame.from_records(input)
-    results = model.predict(X)
+
+    results = model.predict(input)
     logging.info("Output: {}".format(results))
